@@ -77,16 +77,25 @@ class PokemonCatchWorker(object):
                             pokeball = 1 # default:poke ball
 
                             if balls_stock[1] <= 0: # if poke ball are out of stock
-                                if balls_stock[2] > 0: # and player has great balls in stock...
+                                if balls_stock[2] > 0 and pokemon_potential > self.config.balls_above_cp['great_ball']: # and player has great balls in stock...
                                     pokeball = 2 # then use great balls
-                                elif balls_stock[3] > 0: # or if great balls are out of stock too, and player has ultra balls...
+                                elif balls_stock[3] > 0 and pokemon_potential > self.config.balls_above_cp['ultra_ball']: # or if great balls are out of stock too, and player has ultra balls...
                                     pokeball = 3 # then use ultra balls
                                 else:
                                     pokeball = 0 # player doesn't have any of pokeballs, great balls or ultra balls
+                            balls = {1: 'pokeball', 2: 'great_ball', 3: 'ultra_ball', 4: 'master_ball'}
 
                             while(pokeball < 3):
-                                if catch_rate[pokeball-1] < 0.35 and balls_stock[pokeball+1] > 0:
-                                    # if current ball chance to catch is under 35%, and player has better ball - then use it
+                                if pokeball == 0:
+                                    break
+                                # Convert 2 -> 'great_ball' for config
+                                curr_ball = balls[pokeball+1]
+                                print('pokeball', pokeball, 'curr_ball', curr_ball)
+                                print("Catch rates: {}".format(catch_rate))
+                                print("Pokeball: {}".format(pokeball))
+                                print("curr_ball: {}".format(curr_ball))
+                                print("balls_above_probability: {}".format(self.config.balls_above_probability))
+                                if catch_rate[pokeball-1] > self.config.balls_above_probability[curr_ball] and balls_stock[pokeball+1] > 0 and pokemon_potential > self.config.balls_above_cp[curr_ball]:
                                     pokeball = pokeball+1 # use better ball
                                 else:
                                     break

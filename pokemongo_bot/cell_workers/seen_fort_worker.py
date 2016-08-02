@@ -88,6 +88,20 @@ class SeenFortWorker(object):
                                 logger.log("[+] Recycling success", 'green')
                             else:
                                 logger.log("[+] Recycling failed!", 'red')
+
+                        # Flatten dictionary from config
+                        max_items = {}
+                        for d in self.config.max_items:
+                            max_items[d['item_id']] = d['max_number']
+
+                        print(item_id, max_items)
+                        if item_id in max_items:
+                            curr_count = self.bot.item_inventory_count(item_id)
+                            if curr_count > max_items[item_id]:
+                                num_drop = curr_count - max_items[item_id]
+                                logger.log("[+] Item {} is over limit, dropping {} to reach {}".format(item_id, num_drop, max_items[item_id]), 'green')
+                                self.bot.drop_item(item_id=item_id, count=num_drop)
+
                 else:
                     logger.log("[#] Nothing found.", 'yellow')
 

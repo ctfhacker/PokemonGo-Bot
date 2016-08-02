@@ -56,6 +56,7 @@ def init_config():
     # Select a config file code
     parser.add_argument("-cf", "--config", help="Config File to use")
     config_arg = unicode(parser.parse_args().config)
+    print(config_arg)
     if os.path.isfile(config_arg):
         with open(config_arg) as data:
             load.update(json.load(data))
@@ -157,6 +158,10 @@ def init_config():
         if key in load:
             config.__dict__[key] = load[key]
 
+    hidden_options = ['max_items', 'balls_above_cp', 'balls_above_probability']
+    for opt in hidden_options:
+        config.__setattr__(opt, load.get(opt, None))
+
     if config.auth_service not in ['ptc', 'google']:
         logging.error("Invalid Auth service specified! ('ptc' or 'google')")
         return None
@@ -183,6 +188,7 @@ def init_config():
     if config.evolve_all:
         config.evolve_all = [str(pokemon_name) for pokemon_name in config.evolve_all.split(',')]
 
+    print(config.max_items)
     return config
 
 
